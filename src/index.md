@@ -28,6 +28,10 @@ eleventyNavigation:
     <h3><a href="./04-directory/index.md">04. 目录结构与路由取舍 →</a></h3>
     <p>实测 11ty 招牌 <code>*.11tydata.json</code> 数据级联与离线 <code>.md</code> 相对链接自动重写。</p>
   </div>
+  <div class="hero-card">
+    <h3><a href="./05-code-blocks.md">05. 高阶代码块与语法高亮 →</a></h3>
+    <p>实测 <code>@11ty/eleventy-plugin-syntaxhighlight</code> 的 0-indexed <code>ts/2,6-8</code> 行高亮与 <code>diff-ts</code> 复合词法高亮。</p>
+  </div>
 </div>
 
 ## 精确锁定版本档案（`package.json`）
@@ -38,7 +42,7 @@ Eleventy v3 全面拥抱原生 ESM（`"type": "module"`）。本子站将语法�
 | :--- | :--- | :--- |
 | `@11ty/eleventy` | `3.1.8` | v3 原生 ESM 核心编译器（内置 `HtmlBasePlugin` 与 `InputPathToUrlTransformPlugin`） |
 | `@11ty/eleventy-navigation` | `1.0.5` | 官方无绑定多级导航树插件（配合 `eleventyNavigation` 与目录数据级联生成侧边栏） |
-| `@11ty/eleventy-plugin-syntaxhighlight` | `5.0.2` | 基于 PrismJS 的 100% 构建期代码语法高亮（零运行时脚本） |
+| `@11ty/eleventy-plugin-syntaxhighlight` | `5.0.2` | 基于 PrismJS + `diff-highlight` 的 100% 构建期代码语法高亮（零运行时脚本） |
 | `markdown-it` | `15.0.3` | 底层可插拔 CommonMark 解析内核（通过 `setLibrary("md")` 与 `amendLibrary("md")` 定制） |
 | `@mdit/plugin-alert` | `2.2.0` | 原生解析 GitHub Flavored Markdown `> [!NOTE]` 至 `> [!CAUTION]` 五类警报块 |
 | `@mdit/plugin-katex` | `1.2.1` | 构建期调用 KaTeX 服务端输出数学公式 HTML + MathML，无需浏览器加载 `katex.min.js` |
@@ -53,3 +57,4 @@ Eleventy v3 全面拥抱原生 ESM（`"type": "module"`）。本子站将语法�
 | [`02-diagrams.md`](./02-diagrams.md) | 流程图与时序图 | 正文三段 Mermaid 代码块一字不改；由 `amendLibrary("md")` 转换为 `.mermaid` 容器并触发按需脚本加载 |
 | [`03-math.md`](./03-math.md) | 数学公式排版 | 正文公式与 `\$` 转义测试一字不改；由 `@mdit/plugin-katex` 构建期直出 HTML，零双反斜杠吞噬 |
 | [`04-directory/`](./04-directory/index.md) | 目录结构与路由取舍 | 保留 `index.md` 与离线 `.md` 相对链接！新增 `04-directory.11tydata.json` 与 `nested.11tydata.json` 展示数据级联 |
+| [`05-code-blocks.md`](./05-code-blocks.md) | 高阶代码块与语法高亮 | `order: 5`；使用 11ty 专属 0-indexed `ts/2,6-8` 与 `json/2,6-8` 行高亮，以及内置 `diff-ts` 复合词法高亮 |
