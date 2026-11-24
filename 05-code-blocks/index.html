@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>05. 高阶代码块与语法高亮 · Eleventy (11ty) 基准实测站</title>
+    <meta name="description" content="标准 GFM 母版派生：实测 @11ty/eleventy-plugin-syntaxhighlight (PrismJS 构建期 SSR) 独有的 0-indexed 斜杠行高亮 (ts/2,6-8 &amp; json/2,6-8) 与 diff-ts 复合词法高亮。">
+    <link rel="stylesheet" href="/eleventy/assets/katex.min.css">
+    <link rel="stylesheet" href="/eleventy/assets/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/eleventy/">
+        <span>Eleventy (11ty) 基准实测站</span>
+        <span class="version-pill">v3.1.8 · ESM</span>
+        <span class="zero-js-pill" title="当前页面构建产物含 0 个 script 标签">0 KB Client JS</span>
+      </a>
+      <div class="topbar-actions">
+        <a href="https://page.2401.xyz/" target="_top">对比总站</a>
+        <a href="https://github.com/page2401/eleventy" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-btn" id="eleventy-theme-toggle" type="button" onclick="var r=document.documentElement,d=!(r.getAttribute('data-theme')==='dark'||r.classList.contains('dark'));r.classList.toggle('dark',d);r.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('eleventy-benchmark-theme',d?'dark':'light')}catch(e){}if(window.__renderEleventyMermaid){window.__renderEleventyMermaid();}">
+          <span class="theme-label-dark">深色模式</span>
+          <span class="theme-label-light">浅色模式</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="文档章节导航">
+        <div class="nav-group-label">基准章节 (eleventy-navigation)</div>
+        
+        <ul class="nav-list">
+<li>
+  <a class="nav-link" href="/eleventy/">
+    00. 概览与版本档案
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/01-annotations/">
+    01. 专属标注与元数据
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/02-diagrams/">
+    02. 流程图与时序图
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/03-math/">
+    03. 数学公式排版
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/">
+    04. 目录结构与路由取舍
+  </a><ul class="nav-sublist">
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/01-order-and-url/">
+    嵌套子页 A：排序前缀与 URL 纯净度权衡
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/02-sidebar-sync/">
+    嵌套子页 B：多级子目录与侧边栏同步机制
+  </a></li>
+</ul></li>
+
+<li>
+  <a class="nav-link active" href="/eleventy/05-code-blocks/">
+    05. 高阶代码块与语法高亮
+  </a></li>
+</ul>
+      </aside>
+
+      <main class="main-content">
+        <article class="doc-article">
+          <h1 id="05-高阶代码块与语法高亮-11ty-eleventy-plugin-syntaxhighlight-基准">05. 高阶代码块与语法高亮（<code>@11ty/eleventy-plugin-syntaxhighlight</code> 基准）</h1>
+<p>技术文档中超过 40% 的篇幅由代码块构成，但标准 CommonMark / GitHub Flavored Markdown <strong>仅定义了围栏语言标识（<code>```ts</code>）</strong>，并未定义文件名标题栏、指定行高亮、带语法着色的行级 Diff 以及多语言 Tab 代码组。本文件由原始 GFM 母版派生适配至 <strong>Eleventy (<code>@11ty/eleventy@3.1.8</code>)</strong>，页面全程保持 <strong>0 个 <code>&lt;script&gt;</code> 标签（0 KB Client JS）</strong>。</p>
+<h2 id="1-代码块标题栏与斜杠行聚焦-ts-2-6-8-注意-0-indexed-陷阱">1. 代码块标题栏与斜杠行聚焦（<code>```ts/2,6-8</code> · 注意 0-Indexed 陷阱！）</h2>
+<p>官方插件 <code>@11ty/eleventy-plugin-syntaxhighlight@5.0.2</code> 在 Node.js 构建期调用 <strong>PrismJS</strong> 直接输出纯静态 <code>.token</code> 标签。与社区常见的 <code>{3,7-9}</code> 花括号方言截然不同，11ty 采用 <strong><code>语言/行号</code> 斜杠后缀语法</strong>，且行号<strong>严格从 <code>0</code> 开始计数（0-indexed）</strong>！例如下方代码用 <code>```ts/2,6-8</code> 精确将人类视角的第 <code>3</code> 行（索引 <code>2</code>）与第 <code>7–9</code> 行（索引 <code>6-8</code>）包裹为语义化的 <code>&lt;mark class=&quot;highlight-line highlight-line-active&quot;&gt;</code>：</p>
+<p><strong><code>scripts/resolve-route.ts</code></strong></p>
+<pre class="language-ts"><code class="language-ts"><span class="highlight-line"><span class="token keyword">export</span> <span class="token keyword">interface</span> <span class="token class-name">RouteContext</span> <span class="token punctuation">{</span></span>
+<span class="highlight-line">  basePath<span class="token operator">:</span> <span class="token builtin">string</span></span>
+<mark class="highlight-line highlight-line-active">  slug<span class="token operator">:</span> <span class="token builtin">string</span></mark>
+<span class="highlight-line">  cleanUrls<span class="token operator">:</span> <span class="token builtin">boolean</span></span>
+<span class="highlight-line"><span class="token punctuation">}</span></span>
+<span class="highlight-line"></span>
+<mark class="highlight-line highlight-line-active"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">formatDocRoute</span><span class="token punctuation">(</span>ctx<span class="token operator">:</span> RouteContext<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span> <span class="token punctuation">{</span></mark>
+<mark class="highlight-line highlight-line-active">  <span class="token keyword">const</span> prefix <span class="token operator">=</span> ctx<span class="token punctuation">.</span>basePath<span class="token punctuation">.</span><span class="token function">endsWith</span><span class="token punctuation">(</span><span class="token string">'/'</span><span class="token punctuation">)</span> <span class="token operator">?</span> ctx<span class="token punctuation">.</span>basePath <span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>ctx<span class="token punctuation">.</span>basePath<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/</span><span class="token template-punctuation string">`</span></span></mark>
+<mark class="highlight-line highlight-line-active">  <span class="token keyword">const</span> normalized <span class="token operator">=</span> ctx<span class="token punctuation">.</span>slug<span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^\/+|\/+$</span><span class="token regex-delimiter">/</span><span class="token regex-flags">g</span></span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span></mark>
+<span class="highlight-line">  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>normalized <span class="token operator">||</span> normalized <span class="token operator">===</span> <span class="token string">'index'</span><span class="token punctuation">)</span> <span class="token keyword">return</span> prefix</span>
+<span class="highlight-line">  <span class="token keyword">return</span> ctx<span class="token punctuation">.</span>cleanUrls <span class="token operator">?</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>prefix<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>normalized<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/</span><span class="token template-punctuation string">`</span></span> <span class="token operator">:</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>prefix<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>normalized<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">.html</span><span class="token template-punctuation string">`</span></span></span>
+<span class="highlight-line"><span class="token punctuation">}</span></span></code></pre>
+<h2 id="2-配置文件关键行聚焦与双斜杠语义标记-json-2-6-8">2. 配置文件关键行聚焦与双斜杠语义标记（<code>json/2,6-8</code>）</h2>
+<p>同样地，对母版 11 行 JSON 配置聚焦第 <code>3</code> 行与第 <code>7–9</code> 行时，必须将 1-based 行号减 1 改写为 <code>```json/2,6-8</code>（此外，11ty 还支持双斜杠 <code>语言/新增行/删除行</code> 语法直接渲染 <code>&lt;ins&gt;</code> 与 <code>&lt;del&gt;</code> 行标签）：</p>
+<pre class="language-json"><code class="language-json"><span class="highlight-line"><span class="token punctuation">{</span></span>
+<span class="highlight-line">  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"ssg-benchmark"</span><span class="token punctuation">,</span></span>
+<mark class="highlight-line highlight-line-active">  <span class="token property">"routeStyle"</span><span class="token operator">:</span> <span class="token string">"clean"</span><span class="token punctuation">,</span></mark>
+<span class="highlight-line">  <span class="token property">"strictZeroCdn"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span></span>
+<span class="highlight-line">  <span class="token property">"markdown"</span><span class="token operator">:</span> <span class="token punctuation">{</span></span>
+<span class="highlight-line">    <span class="token property">"mathEngine"</span><span class="token operator">:</span> <span class="token string">"katex"</span><span class="token punctuation">,</span></span>
+<mark class="highlight-line highlight-line-active">    <span class="token property">"diagramEngine"</span><span class="token operator">:</span> <span class="token string">"mermaid"</span><span class="token punctuation">,</span></mark>
+<mark class="highlight-line highlight-line-active">    <span class="token property">"lineHighlight"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span></mark>
+<mark class="highlight-line highlight-line-active">    <span class="token property">"codeTransformers"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"diff"</span><span class="token punctuation">,</span> <span class="token string">"focus"</span><span class="token punctuation">]</span></mark>
+<span class="highlight-line">  <span class="token punctuation">}</span></span>
+<span class="highlight-line"><span class="token punctuation">}</span></span></code></pre>
+<h2 id="3-保留-typescript-词法着色的复合-diff-diff-ts-原生支持">3. 保留 TypeScript 词法着色的复合 Diff（<code>diff-ts</code> 原生支持！）</h2>
+<p>这是 <code>@11ty/eleventy-plugin-syntaxhighlight</code> 相比传统 Pygments / Chroma / Giallo 的一大惊喜：插件内部预装了 <code>prismjs/plugins/diff-highlight/prism-diff-highlight</code>！只需将母版的 <code>```diff</code> 改写为 <strong><code>```diff-ts</code></strong>，即可在保留 <code>-</code> / <code>+</code> 增删整行背景的同时，<strong>完整保留内部 <code>const</code>、<code>path.resolve</code>、模板字符串等 TypeScript 词法着色</strong>：</p>
+<pre class="language-diff-ts"><code class="language-diff-ts"><span class="token unchanged language-ts"><span class="token prefix unchanged"> </span><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">mountSubsite</span><span class="token punctuation">(</span>baseDir<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">,</span> subPath<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">string</span> <span class="token operator">|</span> <span class="token keyword">null</span> <span class="token punctuation">{</span>
+</span><span class="token deleted-sign deleted language-ts"><span class="token prefix deleted">-</span>  <span class="token keyword">const</span> cleanRel <span class="token operator">=</span> <span class="token function">decodeURIComponent</span><span class="token punctuation">(</span>subPath<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">\.\.</span><span class="token regex-delimiter">/</span><span class="token regex-flags">g</span></span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span>
+<span class="token prefix deleted">-</span>  <span class="token keyword">return</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>baseDir<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">/</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>cleanRel<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span>
+</span><span class="token inserted-sign inserted language-ts"><span class="token prefix inserted">+</span>  <span class="token keyword">const</span> resolvedBase <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>baseDir<span class="token punctuation">)</span>
+<span class="token prefix inserted">+</span>  <span class="token keyword">const</span> target <span class="token operator">=</span> path<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span>resolvedBase<span class="token punctuation">,</span> <span class="token function">decodeURIComponent</span><span class="token punctuation">(</span>subPath<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex"><span class="token regex-delimiter">/</span><span class="token regex-source language-regex">^\/+</span><span class="token regex-delimiter">/</span></span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token prefix inserted">+</span>  <span class="token keyword">return</span> target<span class="token punctuation">.</span><span class="token function">startsWith</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>resolvedBase<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>path<span class="token punctuation">.</span>sep<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span> <span class="token operator">?</span> target <span class="token operator">:</span> <span class="token keyword">null</span>
+</span><span class="token unchanged language-ts"><span class="token prefix unchanged"> </span><span class="token punctuation">}</span>
+</span></code></pre>
+<h2 id="4-多语言运行时命令组-零客户端-js-的纯-html-radio-tabs-与">4. 多语言运行时命令组（零客户端 JS 的纯 HTML Radio Tabs 与 <code>&lt;details&gt;</code>）</h2>
+<p>为贯彻 Eleventy 的 <strong>Zero-Client-JS</strong> 哲学，下方采用纯 HTML <code>&lt;input type=&quot;radio&quot;&gt;</code> + CSS 相邻兄弟选择器实现多运行时命令面板切换（内部 <code>```bash</code> 块照常经过构建期 Prism 高亮，0 字节浏览器脚本）：</p>
+<div class="eleventy-code-tabs">
+  <input type="radio" name="eleventy-runtime-tabs" id="eleventy-tab-node" checked="">
+  <label for="eleventy-tab-node">Node.js (<code>package.json</code> · 当前子站)</label>
+  <input type="radio" name="eleventy-runtime-tabs" id="eleventy-tab-deno">
+  <label for="eleventy-tab-deno">Deno 2 (<code>deno.json</code>)</label>
+  <input type="radio" name="eleventy-runtime-tabs" id="eleventy-tab-py">
+  <label for="eleventy-tab-py">Python (<code>requirements.txt</code>)</label>
+  <input type="radio" name="eleventy-runtime-tabs" id="eleventy-tab-rb">
+  <label for="eleventy-tab-rb">Ruby (<code>Gemfile</code>)</label>
+  <div class="eleventy-tab-panel">
+<pre class="language-bash"><code class="language-bash"><span class="token function">npm</span> ci <span class="token operator">&amp;&amp;</span> <span class="token function">npm</span> run build</code></pre>
+  </div>
+  <div class="eleventy-tab-panel">
+<pre class="language-bash"><code class="language-bash">deno task build</code></pre>
+  </div>
+  <div class="eleventy-tab-panel">
+<pre class="language-bash"><code class="language-bash">pip <span class="token function">install</span> <span class="token parameter variable">-r</span> requirements.txt <span class="token operator">&amp;&amp;</span> sphinx-build <span class="token parameter variable">-b</span> dirhtml <span class="token builtin class-name">.</span> _build/dirhtml</code></pre>
+  </div>
+  <div class="eleventy-tab-panel">
+<pre class="language-bash"><code class="language-bash">bundle <span class="token function">install</span> <span class="token operator">&amp;&amp;</span> bundle <span class="token builtin class-name">exec</span> jekyll build</code></pre>
+  </div>
+</div>
+<details>
+<summary>展开查看原生 <code>&lt;details&gt;</code> 折叠备选写法</summary>
+<pre class="language-bash"><code class="language-bash">npx @11ty/eleventy</code></pre>
+</details>
+<h2 id="5-四大底层高亮引擎能力对照小结">5. 四大底层高亮引擎能力对照小结</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">高亮引擎代表</th>
+<th style="text-align:left">典型采用框架</th>
+<th style="text-align:left">构建期零运行时 JS</th>
+<th style="text-align:left">原生行号 / 行高亮</th>
+<th style="text-align:left">保留词法着色的 Diff</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Shiki / Expressive Code</strong></td>
+<td style="text-align:left">VitePress、Starlight、Fumadocs、Nextra、Rspress、Nuxt、Quartz</td>
+<td style="text-align:left">✅ 纯静态内联样式</td>
+<td style="text-align:left">✅ <code>{1,3-5}</code> / <code>[!code highlight]</code></td>
+<td style="text-align:left">✅ <code>// [!code ++]</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Prism.js</strong></td>
+<td style="text-align:left">Docusaurus、VuePress、<strong>Eleventy (plugin)</strong>、Gatsby</td>
+<td style="text-align:left">✅ 静态 Token 类名</td>
+<td style="text-align:left">✅ <strong>11ty 专属 0-indexed <code>ts/2,6-8</code></strong></td>
+<td style="text-align:left">✅ <strong>11ty 内置 <code>diff-ts</code> 复合词法高亮</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Pygments / Rouge</strong></td>
+<td style="text-align:left">MkDocs Material、Sphinx、Pelican、Jekyll</td>
+<td style="text-align:left">✅ Python/Ruby 编译直出</td>
+<td style="text-align:left">✅ <code>hl_lines</code> / <code>emphasize-lines</code></td>
+<td style="text-align:left">⚠️ 仅标准 <code>diff</code> 块红绿</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Chroma / Giallo / hljs</strong></td>
+<td style="text-align:left">Hugo (Go Chroma)、Zola (Rust Giallo)、mdBook (hljs)</td>
+<td style="text-align:left">✅ (mdBook 为客户端 hljs)</td>
+<td style="text-align:left">✅ Hugo/Zola 原生 <code>hl_lines</code></td>
+<td style="text-align:left">⚠️ 仅标准 <code>diff</code> 块红绿</td>
+</tr>
+</tbody>
+</table>
+
+        </article>
+      </main>
+
+      <aside class="toc-aside"><div class="toc-title">本页目录</div>
+        <nav aria-label="本页目录">
+          <ul class="toc-list"><li class="toc-h2">
+              <a href="#1-代码块标题栏与斜杠行聚焦-ts-2-6-8-注意-0-indexed-陷阱">1. 代码块标题栏与斜杠行聚焦（```ts/2,6-8 · 注意 0-Indexed 陷阱！）</a>
+            </li><li class="toc-h2">
+              <a href="#2-配置文件关键行聚焦与双斜杠语义标记-json-2-6-8">2. 配置文件关键行聚焦与双斜杠语义标记（json/2,6-8）</a>
+            </li><li class="toc-h2">
+              <a href="#3-保留-typescript-词法着色的复合-diff-diff-ts-原生支持">3. 保留 TypeScript 词法着色的复合 Diff（diff-ts 原生支持！）</a>
+            </li><li class="toc-h2">
+              <a href="#4-多语言运行时命令组-零客户端-js-的纯-html-radio-tabs-与">4. 多语言运行时命令组（零客户端 JS 的纯 HTML Radio Tabs 与 &amp;lt;details&amp;gt;）</a>
+            </li><li class="toc-h2">
+              <a href="#5-四大底层高亮引擎能力对照小结">5. 四大底层高亮引擎能力对照小结</a>
+            </li></ul>
+        </nav></aside>
+    </div>
+  </body>
+</html>

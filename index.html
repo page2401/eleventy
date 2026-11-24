@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eleventy (11ty) 基准实测站</title>
+    <meta name="description" content="Node.js 零客户端 JS 纯粹派静态站点生成器 Eleventy (@11ty/eleventy 3.1.8 ESM) 基准实测子站。">
+    <link rel="stylesheet" href="/eleventy/assets/katex.min.css">
+    <link rel="stylesheet" href="/eleventy/assets/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/eleventy/">
+        <span>Eleventy (11ty) 基准实测站</span>
+        <span class="version-pill">v3.1.8 · ESM</span>
+        <span class="zero-js-pill" title="当前页面构建产物含 0 个 script 标签">0 KB Client JS</span>
+      </a>
+      <div class="topbar-actions">
+        <a href="https://page.2401.xyz/" target="_top">对比总站</a>
+        <a href="https://github.com/page2401/eleventy" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-btn" id="eleventy-theme-toggle" type="button" onclick="var r=document.documentElement,d=!(r.getAttribute('data-theme')==='dark'||r.classList.contains('dark'));r.classList.toggle('dark',d);r.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('eleventy-benchmark-theme',d?'dark':'light')}catch(e){}if(window.__renderEleventyMermaid){window.__renderEleventyMermaid();}">
+          <span class="theme-label-dark">深色模式</span>
+          <span class="theme-label-light">浅色模式</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="文档章节导航">
+        <div class="nav-group-label">基准章节 (eleventy-navigation)</div>
+        
+        <ul class="nav-list">
+<li>
+  <a class="nav-link active" href="/eleventy/">
+    00. 概览与版本档案
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/01-annotations/">
+    01. 专属标注与元数据
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/02-diagrams/">
+    02. 流程图与时序图
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/03-math/">
+    03. 数学公式排版
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/">
+    04. 目录结构与路由取舍
+  </a><ul class="nav-sublist">
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/01-order-and-url/">
+    嵌套子页 A：排序前缀与 URL 纯净度权衡
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/02-sidebar-sync/">
+    嵌套子页 B：多级子目录与侧边栏同步机制
+  </a></li>
+</ul></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/05-code-blocks/">
+    05. 高阶代码块与语法高亮
+  </a></li>
+</ul>
+      </aside>
+
+      <main class="main-content">
+        <article class="doc-article">
+          <h1 id="eleventy-11ty-3-1-8-esm-基准实测子站">Eleventy / 11ty (<code>3.1.8</code> ESM) 基准实测子站</h1>
+<p>本子模块由主仓 <code>page2401.github.io/docs/</code> 标准 GFM 母版<strong>最小化派生适配</strong>而来，实测前端纯粹主义标杆生成器 <strong>Eleventy (<code>@11ty/eleventy@3.1.8</code>)</strong> 在原生 ESM 配置、<strong>零客户端 JS 哲学（Zero-Client-JS）</strong>、<strong>Data Cascade 目录数据级联</strong>以及 <code>HtmlBasePlugin</code> + <code>InputPathToUrlTransformPlugin</code> 双内置插件下的真实工程表现。</p>
+<div class="hero-grid">
+  <div class="hero-card">
+    <h3><a href="/eleventy/01-annotations/">01. 专属标注与元数据 →</a></h3>
+    <p>实测 Nunjucks 成对短代码 <code>{% callout %}</code> 与 <code>@mdit/plugin-alert</code> 原生直通 GFM 五类警报。</p>
+  </div>
+  <div class="hero-card">
+    <h3><a href="/eleventy/02-diagrams/">02. 流程图与时序图 →</a></h3>
+    <p>通过 <code>amendLibrary("md")</code> 接管围栏块，仅在含图表的页面按需挂载本地 <code>mermaid@12.3.0</code>。</p>
+  </div>
+  <div class="hero-card">
+    <h3><a href="/eleventy/03-math/">03. 数学公式排版 →</a></h3>
+    <p>基于 <code>@mdit/plugin-katex</code> 构建期服务端渲染纯静态 HTML，正文章节实现 <strong>0 个 script 标签</strong>。</p>
+  </div>
+  <div class="hero-card">
+    <h3><a href="/eleventy/04-directory/">04. 目录结构与路由取舍 →</a></h3>
+    <p>实测 11ty 招牌 <code>*.11tydata.json</code> 数据级联与离线 <code>.md</code> 相对链接自动重写。</p>
+  </div>
+  <div class="hero-card">
+    <h3><a href="/eleventy/05-code-blocks/">05. 高阶代码块与语法高亮 →</a></h3>
+    <p>实测 <code>@11ty/eleventy-plugin-syntaxhighlight</code> 的 0-indexed <code>ts/2,6-8</code> 行高亮与 <code>diff-ts</code> 复合词法高亮。</p>
+  </div>
+</div>
+<h2 id="精确锁定版本档案-package-json">精确锁定版本档案（<code>package.json</code>）</h2>
+<p>Eleventy v3 全面拥抱原生 ESM（<code>&quot;type&quot;: &quot;module&quot;</code>）。本子站将语法高亮、数学公式与导航树全部下沉至 Node.js 构建期完成，所有非图表页面输出 <strong>0 字节客户端 JS（0 个 <code>&lt;script&gt;</code> 标签）</strong>；KaTeX 字体与 Mermaid 脚本通过 <code>addPassthroughCopy</code> 本地化拷贝至 <code>_site/assets/</code>，全站零外部 CDN 请求：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">依赖包名称</th>
+<th style="text-align:left">精确锁定版本</th>
+<th style="text-align:left">在本子站中的职责与接入方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>@11ty/eleventy</code></td>
+<td style="text-align:left"><code>3.1.8</code></td>
+<td style="text-align:left">v3 原生 ESM 核心编译器（内置 <code>HtmlBasePlugin</code> 与 <code>InputPathToUrlTransformPlugin</code>）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>@11ty/eleventy-navigation</code></td>
+<td style="text-align:left"><code>1.0.5</code></td>
+<td style="text-align:left">官方无绑定多级导航树插件（配合 <code>eleventyNavigation</code> 与目录数据级联生成侧边栏）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>@11ty/eleventy-plugin-syntaxhighlight</code></td>
+<td style="text-align:left"><code>5.0.2</code></td>
+<td style="text-align:left">基于 PrismJS + <code>diff-highlight</code> 的 100% 构建期代码语法高亮（零运行时脚本）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>markdown-it</code></td>
+<td style="text-align:left"><code>15.0.3</code></td>
+<td style="text-align:left">底层可插拔 CommonMark 解析内核（通过 <code>setLibrary(&quot;md&quot;)</code> 与 <code>amendLibrary(&quot;md&quot;)</code> 定制）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>@mdit/plugin-alert</code></td>
+<td style="text-align:left"><code>2.2.0</code></td>
+<td style="text-align:left">原生解析 GitHub Flavored Markdown <code>&gt; [!NOTE]</code> 至 <code>&gt; [!CAUTION]</code> 五类警报块</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>@mdit/plugin-katex</code></td>
+<td style="text-align:left"><code>1.2.1</code></td>
+<td style="text-align:left">构建期调用 KaTeX 服务端输出数学公式 HTML + MathML，无需浏览器加载 <code>katex.min.js</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>katex</code></td>
+<td style="text-align:left"><code>0.19.1</code></td>
+<td style="text-align:left">通过 <code>addPassthroughCopy</code> 提取 <code>katex.min.css</code> 与 <code>fonts/*</code> 本地静态托管</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>mermaid</code></td>
+<td style="text-align:left"><code>12.3.0</code></td>
+<td style="text-align:left">仅当页面产物包含 <code>.mermaid</code> 容器时按需引入 <code>/eleventy/assets/mermaid.min.js</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="五大标准基准章节对照">五大标准基准章节对照</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">章节路径</th>
+<th style="text-align:left">测试维度</th>
+<th style="text-align:left">相对母版 <code>docs/*.md</code> 的核心派生改造点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="/eleventy/01-annotations/"><code>01-annotations.md</code></a></td>
+<td style="text-align:left">专属标注与元数据</td>
+<td style="text-align:left">补充 <code>eleventyNavigation</code>；第 2 节演示 Nunjucks <code>{% callout %}</code> 成对短代码，第 4 节靠 <code>@mdit/plugin-alert</code> 零改动直通 <code>&gt; [!NOTE]</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/eleventy/02-diagrams/"><code>02-diagrams.md</code></a></td>
+<td style="text-align:left">流程图与时序图</td>
+<td style="text-align:left">正文三段 Mermaid 代码块一字不改；由 <code>amendLibrary(&quot;md&quot;)</code> 转换为 <code>.mermaid</code> 容器并触发按需脚本加载</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/eleventy/03-math/"><code>03-math.md</code></a></td>
+<td style="text-align:left">数学公式排版</td>
+<td style="text-align:left">正文公式与 <code>\$</code> 转义测试一字不改；由 <code>@mdit/plugin-katex</code> 构建期直出 HTML，零双反斜杠吞噬</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/eleventy/04-directory/"><code>04-directory/</code></a></td>
+<td style="text-align:left">目录结构与路由取舍</td>
+<td style="text-align:left">保留 <code>index.md</code> 与离线 <code>.md</code> 相对链接！新增 <code>04-directory.11tydata.json</code> 与 <code>nested.11tydata.json</code> 展示数据级联</td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="/eleventy/05-code-blocks/"><code>05-code-blocks.md</code></a></td>
+<td style="text-align:left">高阶代码块与语法高亮</td>
+<td style="text-align:left"><code>order: 5</code>；使用 11ty 专属 0-indexed <code>ts/2,6-8</code> 与 <code>json/2,6-8</code> 行高亮，以及内置 <code>diff-ts</code> 复合词法高亮</td>
+</tr>
+</tbody>
+</table>
+
+        </article>
+      </main>
+
+      <aside class="toc-aside"></aside>
+    </div>
+  </body>
+</html>

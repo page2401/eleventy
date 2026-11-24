@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01. 专属标注与元数据 · Eleventy (11ty) 基准实测站</title>
+    <meta name="description" content="测试 Eleventy v3 的 YAML Frontmatter、Data Cascade 继承、Nunjucks 成对短代码与 @mdit/plugin-alert 原生 GFM Alerts。">
+    <link rel="stylesheet" href="/eleventy/assets/katex.min.css">
+    <link rel="stylesheet" href="/eleventy/assets/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/eleventy/">
+        <span>Eleventy (11ty) 基准实测站</span>
+        <span class="version-pill">v3.1.8 · ESM</span>
+        <span class="zero-js-pill" title="当前页面构建产物含 0 个 script 标签">0 KB Client JS</span>
+      </a>
+      <div class="topbar-actions">
+        <a href="https://page.2401.xyz/" target="_top">对比总站</a>
+        <a href="https://github.com/page2401/eleventy" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-btn" id="eleventy-theme-toggle" type="button" onclick="var r=document.documentElement,d=!(r.getAttribute('data-theme')==='dark'||r.classList.contains('dark'));r.classList.toggle('dark',d);r.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('eleventy-benchmark-theme',d?'dark':'light')}catch(e){}if(window.__renderEleventyMermaid){window.__renderEleventyMermaid();}">
+          <span class="theme-label-dark">深色模式</span>
+          <span class="theme-label-light">浅色模式</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="文档章节导航">
+        <div class="nav-group-label">基准章节 (eleventy-navigation)</div>
+        
+        <ul class="nav-list">
+<li>
+  <a class="nav-link" href="/eleventy/">
+    00. 概览与版本档案
+  </a></li>
+
+<li>
+  <a class="nav-link active" href="/eleventy/01-annotations/">
+    01. 专属标注与元数据
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/02-diagrams/">
+    02. 流程图与时序图
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/03-math/">
+    03. 数学公式排版
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/">
+    04. 目录结构与路由取舍
+  </a><ul class="nav-sublist">
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/01-order-and-url/">
+    嵌套子页 A：排序前缀与 URL 纯净度权衡
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/02-sidebar-sync/">
+    嵌套子页 B：多级子目录与侧边栏同步机制
+  </a></li>
+</ul></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/05-code-blocks/">
+    05. 高阶代码块与语法高亮
+  </a></li>
+</ul>
+      </aside>
+
+      <main class="main-content">
+        <article class="doc-article">
+          <h1 id="01-专属标注与元数据-nunjucks-shortcode-gfm-alerts">01. 专属标注与元数据（Nunjucks Shortcode + GFM Alerts）</h1>
+<p>不同静态网站生成器对“提示框 / 标注（Callouts / Admonitions）”和页面元数据的语法约定存在显著分歧。本文件由标准 GFM 母版派生适配至 <strong>Eleventy (<code>@11ty/eleventy@3.1.8</code>)</strong>。</p>
+<h2 id="1-frontmatter-元数据与-data-cascade-机制">1. Frontmatter 元数据与 Data Cascade 机制</h2>
+<p>Eleventy 对 YAML Frontmatter 采取完全开放的无 Schema 约束策略，且凭借独树一帜的 <strong>Data Cascade（数据级联）</strong> 机制，全站布局模板已在根目录 <code>src/src.11tydata.json</code> 中统一声明为 <code>&quot;layout&quot;: &quot;layouts/base.njk&quot;</code>，单篇文档无需重复书写 <code>layout</code> 字段：</p>
+<ul>
+<li><strong>当前页标题字段</strong>：<code>title: &quot;01. 专属标注与元数据&quot;</code></li>
+<li><strong>页面摘要字段</strong>：<code>description: &quot;...&quot;</code></li>
+<li><strong>导航树声明字段</strong>：<code>eleventyNavigation: { key, title, order }</code>（供官方 <code>@11ty/eleventy-navigation</code> 插件构建多级侧边栏，子目录亦可通过 <code>*.11tydata.json</code> 批量注入 <code>parent</code>）</li>
+</ul>
+<h2 id="2-标准提示语义块-eleventy-nunjucks-成对短代码">2. 标准提示语义块（Eleventy Nunjucks 成对短代码）</h2>
+<p>在开启 <code>markdownTemplateEngine: &quot;njk&quot;</code> 后，Eleventy 允许直接在 Markdown 中调用由 <code>eleventyConfig.addPairedShortcode(&quot;callout&quot;, ...)</code> 注册的 Nunjucks 成对短代码 <code>{% callout &quot;type&quot;, &quot;标题&quot; %}...{% endcallout %}</code>：</p>
+<aside class="eleventy-callout is-info">
+<div class="eleventy-callout-title">默认信息提示块</div>
+<div class="eleventy-callout-body">
+<p>静态站点对比平台的每个子模块均独立维护 <code>main</code>（源码）与 <code>page</code>（构建产物）双分支，互不污染提交历史。</p>
+</div>
+</aside>
+<aside class="eleventy-callout is-tip">
+<div class="eleventy-callout-title">性能优化建议（自定义标题语义）</div>
+<div class="eleventy-callout-body">
+<p>在 Eleventy 成对短代码中调用同一 <code>markdown-it</code> 实例渲染内部文本，即可让容器内部无缝支持行内代码、<strong>加粗强调</strong>与数学公式；同时构建产物为纯静态 <code>&lt;aside&gt;</code> 标签，无需任何客户端组件水合。</p>
+</div>
+</aside>
+<aside class="eleventy-callout is-warning">
+<div class="eleventy-callout-title">模板预处理器边界注意</div>
+<div class="eleventy-callout-body">
+<p>当启用 <code>markdownTemplateEngine: &quot;njk&quot;</code> 时，Nunjucks 会在 Markdown 解析前先行扫描全文。若要在正文中展示字面量 <code>{% callout %}</code> 或双花括号语法，必须使用 <code>{% raw %}...{% endraw %}</code> 包裹，否则会被预处理器提前求值！</p>
+</div>
+</aside>
+<aside class="eleventy-callout is-danger">
+<div class="eleventy-callout-title">不可逆分支覆盖警告</div>
+<div class="eleventy-callout-body">
+<p>自动化流水线在向 <code>page</code> 分支推送构建产物时会启用 <code>force_orphan: true</code>，切勿在 <code>page</code> 分支直接手工修改代码！</p>
+</div>
+</aside>
+<h2 id="3-可折叠详情容器-直通标准-html">3. 可折叠详情容器（直通标准 HTML <code>&lt;details&gt;</code>）</h2>
+<p>在 <code>eleventy.config.js</code> 中为 <code>markdown-it</code> 开启 <code>html: true</code> 后，Eleventy 原生直通标准 CommonMark <code>&lt;details&gt;</code> 与 <code>&lt;summary&gt;</code> 折叠块，且内部的语法高亮代码块与构建期 KaTeX 公式均可正常编译：</p>
+<details>
+<summary>点击展开查看 Eleventy 短代码与母版折叠容器源码结构</summary>
+<pre class="language-markdown"><code class="language-markdown">{% callout "tip", "性能优化建议" %}
+Eleventy Nunjucks 成对短代码与纯正 GFM 引用警报并存对比。
+{% endcallout %}</code></pre>
+<p>除了代码块，折叠容器内同样支持列表、表格与数学公式 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">f(x) = x^2 + 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1076em;">f</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>。</p>
+</details>
+<h2 id="4-github-风格引用警报-gfm-alerts-跨框架直通测试">4. GitHub 风格引用警报（GFM Alerts）跨框架直通测试</h2>
+<p>以下三段<strong>保持母版原文一字不改</strong>！通过在 <code>eleventy.config.js</code> 中为 <code>markdown-it</code> 挂载轻量的 <code>@mdit/plugin-alert@2.2.0</code>，Eleventy 可在构建期将全部 5 类 GitHub Flavored Markdown 警报直接编译为语义化提示框：</p>
+<div class="markdown-alert markdown-alert-note">
+<p class="markdown-alert-title">NOTE</p>
+<p>这是一段标准的 GitHub Flavored Markdown <code>[!NOTE]</code> 警报文本，用于检验各生成器对母版语法的零改造直通能力。</p>
+</div>
+<div class="markdown-alert markdown-alert-important">
+<p class="markdown-alert-title">IMPORTANT</p>
+<p>跨平台迁移 Markdown 文档时，是否原生兼容 <code>&gt; [!IMPORTANT]</code> 与 <code>&gt; [!WARNING]</code> 直接决定了母版文档的派生改造成本。</p>
+</div>
+<div class="markdown-alert markdown-alert-caution">
+<p class="markdown-alert-title">CAUTION</p>
+<p>若目标生成器未内置 GFM Alert 解析器（如 VuePress v1、Starlight 默认配置、Docsify v4 旧插件），上方标记会退化为普通引用块并原样露出 <code>[!CAUTION]</code> 字符串。</p>
+</div>
+
+        </article>
+      </main>
+
+      <aside class="toc-aside"><div class="toc-title">本页目录</div>
+        <nav aria-label="本页目录">
+          <ul class="toc-list"><li class="toc-h2">
+              <a href="#1-frontmatter-元数据与-data-cascade-机制">1. Frontmatter 元数据与 Data Cascade 机制</a>
+            </li><li class="toc-h2">
+              <a href="#2-标准提示语义块-eleventy-nunjucks-成对短代码">2. 标准提示语义块（Eleventy Nunjucks 成对短代码）</a>
+            </li><li class="toc-h2">
+              <a href="#3-可折叠详情容器-直通标准-html">3. 可折叠详情容器（直通标准 HTML &amp;lt;details&amp;gt;）</a>
+            </li><li class="toc-h2">
+              <a href="#4-github-风格引用警报-gfm-alerts-跨框架直通测试">4. GitHub 风格引用警报（GFM Alerts）跨框架直通测试</a>
+            </li></ul>
+        </nav></aside>
+    </div>
+  </body>
+</html>

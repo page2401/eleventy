@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>嵌套子页 A：排序前缀与 URL 纯净度权衡 · Eleventy (11ty) 基准实测站</title>
+    <link rel="stylesheet" href="/eleventy/assets/katex.min.css">
+    <link rel="stylesheet" href="/eleventy/assets/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/eleventy/">
+        <span>Eleventy (11ty) 基准实测站</span>
+        <span class="version-pill">v3.1.8 · ESM</span>
+        <span class="zero-js-pill" title="当前页面构建产物含 0 个 script 标签">0 KB Client JS</span>
+      </a>
+      <div class="topbar-actions">
+        <a href="https://page.2401.xyz/" target="_top">对比总站</a>
+        <a href="https://github.com/page2401/eleventy" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-btn" id="eleventy-theme-toggle" type="button" onclick="var r=document.documentElement,d=!(r.getAttribute('data-theme')==='dark'||r.classList.contains('dark'));r.classList.toggle('dark',d);r.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('eleventy-benchmark-theme',d?'dark':'light')}catch(e){}if(window.__renderEleventyMermaid){window.__renderEleventyMermaid();}">
+          <span class="theme-label-dark">深色模式</span>
+          <span class="theme-label-light">浅色模式</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="文档章节导航">
+        <div class="nav-group-label">基准章节 (eleventy-navigation)</div>
+        
+        <ul class="nav-list">
+<li>
+  <a class="nav-link" href="/eleventy/">
+    00. 概览与版本档案
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/01-annotations/">
+    01. 专属标注与元数据
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/02-diagrams/">
+    02. 流程图与时序图
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/03-math/">
+    03. 数学公式排版
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/">
+    04. 目录结构与路由取舍
+  </a><ul class="nav-sublist">
+<li>
+  <a class="nav-link active" href="/eleventy/04-directory/nested/01-order-and-url/">
+    嵌套子页 A：排序前缀与 URL 纯净度权衡
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/02-sidebar-sync/">
+    嵌套子页 B：多级子目录与侧边栏同步机制
+  </a></li>
+</ul></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/05-code-blocks/">
+    05. 高阶代码块与语法高亮
+  </a></li>
+</ul>
+      </aside>
+
+      <main class="main-content">
+        <div class="cascade-banner">
+          <strong>Data Cascade · 04-directory.11tydata.json → nested.11tydata.json</strong>
+          <span>· 本章节及所有下级子路由自动级联继承目录数据文件元数据</span>
+        </div>
+        <article class="doc-article">
+          <h1 id="嵌套子页-a-排序前缀与-url-纯净度权衡">嵌套子页 A：排序前缀与 URL 纯净度权衡</h1>
+<p>在母版目录 <code>docs/04-directory/nested/</code> 中，文件名使用 <code>01-order-and-url.md</code> 以保证在 Git 与代码编辑器中按阅读先后顺序排列。派生至 Eleventy v3 后，不仅可通过 <code>eleventyNavigation.order</code> 精确控制侧边栏次序，若希望抹除线上 URL 中的 <code>01-</code> 序号前缀，也只需在单页或目录级 <code>.11tydata.js</code> 中声明 <code>permalink</code> 计算属性，而不会破坏 <code>InputPathToUrlTransformPlugin</code> 对源文件路径 <code>./02-sidebar-sync.md</code> 的自动解析！</p>
+<ul>
+<li><a href="/eleventy/04-directory/">返回《04. 目录结构与路由取舍》</a></li>
+<li><a href="/eleventy/04-directory/nested/02-sidebar-sync/">下一篇：《嵌套子页 B：多级子目录与侧边栏同步机制》</a></li>
+</ul>
+
+        </article>
+      </main>
+
+      <aside class="toc-aside"></aside>
+    </div>
+  </body>
+</html>

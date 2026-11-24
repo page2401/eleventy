@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04. 目录结构与路由取舍 · Eleventy (11ty) 基准实测站</title>
+    <meta name="description" content="实测 Eleventy v3 的 1:1 目录映射、*.11tydata.json 数据级联（Data Cascade）与内置离线 .md 链接自动重写插件。">
+    <link rel="stylesheet" href="/eleventy/assets/katex.min.css">
+    <link rel="stylesheet" href="/eleventy/assets/style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/eleventy/">
+        <span>Eleventy (11ty) 基准实测站</span>
+        <span class="version-pill">v3.1.8 · ESM</span>
+        <span class="zero-js-pill" title="当前页面构建产物含 0 个 script 标签">0 KB Client JS</span>
+      </a>
+      <div class="topbar-actions">
+        <a href="https://page.2401.xyz/" target="_top">对比总站</a>
+        <a href="https://github.com/page2401/eleventy" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-btn" id="eleventy-theme-toggle" type="button" onclick="var r=document.documentElement,d=!(r.getAttribute('data-theme')==='dark'||r.classList.contains('dark'));r.classList.toggle('dark',d);r.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('eleventy-benchmark-theme',d?'dark':'light')}catch(e){}if(window.__renderEleventyMermaid){window.__renderEleventyMermaid();}">
+          <span class="theme-label-dark">深色模式</span>
+          <span class="theme-label-light">浅色模式</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar" aria-label="文档章节导航">
+        <div class="nav-group-label">基准章节 (eleventy-navigation)</div>
+        
+        <ul class="nav-list">
+<li>
+  <a class="nav-link" href="/eleventy/">
+    00. 概览与版本档案
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/01-annotations/">
+    01. 专属标注与元数据
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/02-diagrams/">
+    02. 流程图与时序图
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/03-math/">
+    03. 数学公式排版
+  </a></li>
+
+<li>
+  <a class="nav-link active" href="/eleventy/04-directory/">
+    04. 目录结构与路由取舍
+  </a><ul class="nav-sublist">
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/01-order-and-url/">
+    嵌套子页 A：排序前缀与 URL 纯净度权衡
+  </a></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/04-directory/nested/02-sidebar-sync/">
+    嵌套子页 B：多级子目录与侧边栏同步机制
+  </a></li>
+</ul></li>
+
+<li>
+  <a class="nav-link" href="/eleventy/05-code-blocks/">
+    05. 高阶代码块与语法高亮
+  </a></li>
+</ul>
+      </aside>
+
+      <main class="main-content">
+        <div class="cascade-banner">
+          <strong>Data Cascade · 04-directory.11tydata.json</strong>
+          <span>· 本章节及所有下级子路由自动级联继承目录数据文件元数据</span>
+        </div>
+        <article class="doc-article">
+          <h1 id="04-目录结构与路由取舍-data-cascade-数据级联模型">04. 目录结构与路由取舍（Data Cascade 数据级联模型）</h1>
+<p>将标准 GFM 母版 <code>docs/04-directory/</code> 迁移至 Eleventy <code>src/04-directory/</code> 时，展现了 11ty 在目录组织上极高的透明度与工程优雅度：</p>
+<div class="markdown-alert markdown-alert-tip">
+<p class="markdown-alert-title">TIP</p>
+<p><strong>Eleventy 三大目录与路由王牌特性</strong></p>
+<ol>
+<li><strong>保留标准 <code>index.md</code>（零改名负担）</strong>：既不像 VuePress 强制改名 <code>README.md</code>，也不像 Hugo / Zola 那样因混淆 <code>index.md</code> 与 <code>_index.md</code> 导致子页面集体 404——<code>src/04-directory/index.md</code> 天然编译为 <code>/eleventy/04-directory/</code>。</li>
+<li><strong>招牌 <code>*.11tydata.json</code> 数据级联（Data Cascade）</strong>：本目录下放置了 <code>04-directory.11tydata.json</code>，子目录放置了 <code>nested/nested.11tydata.json</code>（自动为所有子页面批量注入 <code>&quot;eleventyNavigation&quot;: { &quot;parent&quot;: &quot;04-directory&quot; }</code>），页面顶部的紫色数据级联徽章即来自目录数据文件的自动向下合并！</li>
+<li><strong>内置 <code>InputPathToUrlTransformPlugin</code> + <code>HtmlBasePlugin</code></strong>：文档内部<strong>完全保留母版的离线 <code>.md</code> 相对链接</strong>（如 <code>./nested/01-order-and-url.md</code>），在 VS Code / Obsidian / GitHub 中可直接点击跳转；而在构建时由 11ty v3 内置插件自动重写为带子路径前缀的线上路由 <code>/eleventy/04-directory/nested/01-order-and-url/</code>！</li>
+</ol>
+</div>
+<h2 id="eleventy-目录体系优劣权衡">Eleventy 目录体系优劣权衡</h2>
+<ol>
+<li><strong><code>dir.input: &quot;src&quot;</code> 干净隔离</strong>：工程根目录的 <code>README.md</code>、<code>package.json</code> 与 <code>eleventy.config.js</code> 天然被隔离在 <code>src/</code> 之外，无需手写排除规则。</li>
+<li><strong>元数据按目录树自然继承</strong>：通过 <code>src.11tydata.json</code> → <code>04-directory.11tydata.json</code> → <code>nested.11tydata.json</code> → 单文件 YAML Frontmatter 四级数据合并，彻底消除重复模板配置。</li>
+<li><strong>代价：无开箱即用文档主题</strong>：Eleventy 坚持“不预设任何前端 UI 框架”的微内核哲学，侧边栏递归宏（<code>@11ty/eleventy-navigation</code>）、TOC 提取与样式表均需团队自行编写 Nunjucks / WebC 模板。</li>
+</ol>
+<h2 id="嵌套子文档入口-源码保持纯正-md-相对路径">嵌套子文档入口（源码保持纯正 <code>.md</code> 相对路径）</h2>
+<ul>
+<li><a href="/eleventy/04-directory/nested/01-order-and-url/">进入子文档 A：排序前缀与 URL 纯净度权衡</a></li>
+<li><a href="/eleventy/04-directory/nested/02-sidebar-sync/">进入子文档 B：多级子目录与侧边栏同步机制</a></li>
+</ul>
+
+        </article>
+      </main>
+
+      <aside class="toc-aside"><div class="toc-title">本页目录</div>
+        <nav aria-label="本页目录">
+          <ul class="toc-list"><li class="toc-h2">
+              <a href="#eleventy-目录体系优劣权衡">Eleventy 目录体系优劣权衡</a>
+            </li><li class="toc-h2">
+              <a href="#嵌套子文档入口-源码保持纯正-md-相对路径">嵌套子文档入口（源码保持纯正 .md 相对路径）</a>
+            </li></ul>
+        </nav></aside>
+    </div>
+  </body>
+</html>
